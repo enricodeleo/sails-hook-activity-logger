@@ -5,7 +5,11 @@
  * with user attribution and change tracking.
  */
 
-const ActivityService = require('./lib/services/activity-service');
+const logActivityHelper = require('./lib/helpers/log-activity');
+const getUserIdHelper = require('./lib/helpers/get-user-id');
+const calculateChangesHelper = require('./lib/helpers/calculate-changes');
+const shouldTrackModelHelper = require('./lib/helpers/should-track-model');
+const getLatestActivitiesHelper = require('./lib/helpers/get-latest-activities');
 const activityLogModel = require('./lib/models/activity-log');
 const interceptBlueprints = require('./lib/utils/blueprint-interceptor');
 
@@ -45,10 +49,13 @@ module.exports = function activityLoggerHook(sails) {
       sails.after(['hook:orm:loaded', 'hook:blueprints:loaded'], () => {
         sails.log.debug('Activity Logger: Initializing hook functionality');
 
-        // Register the activity service
-        if (!sails.services.activityservice) {
-          sails.services.activityservice = new ActivityService(sails);
-        }
+        // Register helpers
+        sails.helpers = sails.helpers || {};
+        sails.helpers.logActivity = logActivityHelper;
+        sails.helpers.getUserId = getUserIdHelper;
+        sails.helpers.calculateChanges = calculateChangesHelper;
+        sails.helpers.shouldTrackModel = shouldTrackModelHelper;
+        sails.helpers.getLatestActivities = getLatestActivitiesHelper;
 
         // Hook into blueprints if enabled
         if (sails.config.activityLogger.includeBlueprints) {
