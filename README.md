@@ -8,7 +8,6 @@ A Sails.js hook for tracking model activities (create, update, delete) with user
 npm install sails-hook-activity-logger --save
 ```
 
-
 ## Configuration
 
 Configuration options can be set in `config/activityLogger.js`:
@@ -38,24 +37,53 @@ If you use Sails.js blueprints, activities will be tracked automatically for con
 
 ### Manual Tracking
 
-You can also manually log activities:
+You can also manually log activities using the provided helper:
 
 ```javascript
 // In your controller
-await sails.services.activityservice.log(
-  'update',           // action: 'create', 'update', or 'delete'
-  'project',          // model: the model identity
-  123,                // recordId: ID of the affected record
-  {                   // changes: before/after values
+await sails.helpers.logActivity.with({
+  action: 'update',           // 'create', 'update', or 'delete'
+  model: 'project',           // the model identity
+  recordId: '123',            // ID of the affected record
+  changes: {                  // before/after values
     before: { name: 'Old Project Name' },
     after: { name: 'New Project Name' }
   },
-  req.user.id         // userId: the user who performed the action
-);
+  userId: req.user.id         // the user who performed the action
+});
 ```
-## Working with Activities
 
-The hook creates an activitylog model which you can query like any other model:
+### Helper Methods
+
+The hook provides several helpers:
+
+```javascript
+// Log an activity
+await sails.helpers.logActivity.with({
+  action, model, recordId, changes, userId
+});
+
+// Extract user ID from request
+const userId = await sails.helpers.getUserId.with({
+  req
+});
+
+// Calculate changes between records
+const changes = await sails.helpers.calculateChanges.with({
+  original, updated
+});
+
+// Fetch recent activities
+const activities = await sails.helpers.getLatestActivities.with({
+  model: 'project',
+  limit: 20,
+  populate: true
+});
+```
+
+## Working with Activities
+
+The hook creates an `activitylog` model which you can query like any other model:
 
 ```javascript
 // Get recent activities
@@ -76,3 +104,6 @@ const userActivities = await ActivityLog.find({
 }).sort('createdAt DESC');
 ```
 
+## License
+
+MIT
