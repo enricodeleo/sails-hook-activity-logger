@@ -8,7 +8,8 @@ A Sails.js hook for tracking model activities (create, update, delete) with user
 npm install sails-hook-activity-logger --save
 ```
 
-## Configuration
+
+## Configuration
 
 Configuration options can be set in `config/activityLogger.js`:
 
@@ -74,3 +75,4 @@ const userActivities = await ActivityLog.find({
   userId: req.user.id
 }).sort('createdAt DESC');
 ```
+
