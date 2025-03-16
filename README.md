@@ -21,7 +21,21 @@ module.exports.activityLogger = {
   trackData: true,
 
   // Hook into blueprint actions (optional, default: true)
-  includeBlueprints: true
+  includeBlueprints: true,
+  
+  // Custom routes to log activities for (optional)
+  // Only used if includeBlueprints is true
+  routesToLog: [
+    'POST /api/:model',        // create
+    'PUT /api/:model/:id',     // update
+    'PATCH /api/:model/:id',   // partial update
+    'DELETE /api/:model/:id',  // destroy
+    
+    // You can add custom routes as needed:
+    'POST /api/v1/:model',
+    'PUT /api/v1/:model/:id',
+    // etc.
+  ]
 };
 ```
 
@@ -34,6 +48,8 @@ If you use Sails.js blueprints, activities will be tracked automatically for con
 - Records are created via blueprint actions
 - Records are updated via blueprint actions
 - Records are deleted via blueprint actions
+
+The hook uses a middleware approach that listens to routes matching the patterns in `routesToLog`. This ensures no interference with the normal request-response flow.
 
 ### Manual Tracking
 
@@ -103,6 +119,17 @@ const userActivities = await ActivityLog.find({
   userId: req.user.id
 }).sort('createdAt DESC');
 ```
+
+## How It Works
+
+This hook uses a non-intrusive middleware approach to track activities:
+
+1. It binds to routes matching the patterns in `routesToLog`
+2. When a request to one of these routes is processed, it:
+   - Captures the original record state (for update/delete)
+   - Lets the request proceed normally
+   - After response completes successfully, logs the activity
+3. This approach ensures minimal interference with the normal request/response flow
 
 ## License
 

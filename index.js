@@ -11,7 +11,7 @@ const calculateChangesHelper = require('./lib/helpers/calculate-changes');
 const shouldTrackModelHelper = require('./lib/helpers/should-track-model');
 const getLatestActivitiesHelper = require('./lib/helpers/get-latest-activities');
 const activityLogModel = require('./lib/models/activity-log');
-const interceptBlueprints = require('./lib/utils/blueprint-interceptor');
+const activityLoggerMiddleware = require('./lib/middleware/activity-logger.middleware');
 
 module.exports = function activityLoggerHook(sails) {
   return {
@@ -24,7 +24,16 @@ module.exports = function activityLoggerHook(sails) {
         models: [],
         // Additional configuration options
         trackData: true,       // Track data changes on update
-        includeBlueprints: true // Hook into blueprint actions
+        includeBlueprints: true, // Hook into blueprint actions
+        
+        // Route patterns to intercept for activity logging
+        // These are only used if includeBlueprints is true
+        routesToLog: [
+          'POST /api/:model',        // create
+          'PUT /api/:model/:id',     // update
+          'PATCH /api/:model/:id',   // partial update
+          'DELETE /api/:model/:id',  // destroy
+        ]
       }
     },
 
@@ -57,12 +66,19 @@ module.exports = function activityLoggerHook(sails) {
         sails.helpers.shouldTrackModel = shouldTrackModelHelper;
         sails.helpers.getLatestActivities = getLatestActivitiesHelper;
 
-        // Hook into blueprints if enabled
+        // Hook into router if blueprint tracking is enabled
         if (sails.config.activityLogger.includeBlueprints) {
-          interceptBlueprints(sails);
+          // Listen for when the router in Sails says it's time to bind routes
+          sails.on('router:before', function routerBefore() {
+            // Bind the activity logger middleware to the configured routes
+            sails.config.activityLogger.routesToLog.forEach(routeAddress => {
+              sails.log.verbose('Activity Logger: Binding to route', routeAddress);
+              sails.router.bind(routeAddress, activityLoggerMiddleware);
+            });
+          });
         }
 
-        sails.log.info('Activity Logger initialized for models:',
+        sails.log.info('Activity Logger initialized for models:', 
           sails.config.activityLogger.models || []);
 
         return cb();
