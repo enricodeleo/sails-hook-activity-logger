@@ -1,0 +1,39 @@
+{
+  "name": "sails-hook-activity-logger",
+  "version": "0.1.0",
+  "description": "Activity logging hook for Sails.js applications",
+  "main": "index.js",
+  "sails": {
+    "isHook": true,
+    "hookName": "activityLogger"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "sails",
+    "sails.js",
+    "sails-hook",
+    "activity",
+    "log",
+    "audit",
+    "tracking"
+  ],
+  "author": "Enrico Deleo <hello@enricodeleo.com>",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "sails": "^1.5.0"
+  },
+  "peerDependencies": {
+    "sails": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enricodeleo/sails-hook-activity-logger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/enricodeleo/sails-hook-activity-logger/issues"
+  },
+  "homepage": "https://github.com/enricodeleo/sails-hook-activity-logger#readme"
+}
