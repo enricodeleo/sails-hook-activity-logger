@@ -1,6 +1,6 @@
 {
   "name": "sails-hook-activity-logger",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Activity logging hook for Sails.js 1.x applications",
   "main": "index.js",
   "sails": {
